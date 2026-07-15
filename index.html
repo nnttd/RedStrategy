@@ -43,7 +43,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-full flex flex-col justify-between transition-all-300">
 
-    <header class="w-full max-w-md mx-auto px-4 pt-4 pb-2 flex justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800">
+    <header class="w-full max-w-md md:max-w-5xl mx-auto px-4 pt-4 pb-2 flex justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800">
         <div class="flex items-center space-x-2">
             <!-- 完美的內嵌 SVG 橘黃色 K 線趨勢 Logo，100% 離線相容且絕不失真 -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-8 h-8 rounded-lg shadow-md shadow-amber-500/15">
@@ -95,7 +95,7 @@
         </div>
     </header>
 
-    <main class="flex-1 w-full max-w-md mx-auto px-4 py-4 flex flex-col space-y-4">
+    <main class="flex-1 w-full max-w-md md:max-w-5xl mx-auto px-4 py-4 flex flex-col space-y-4">
         
         <!-- 股票代號/名稱快捷輸入列 -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center space-x-2">
@@ -107,164 +107,206 @@
             </button>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-            <!-- 裝飾用背景光效 -->
-            <div class="absolute -top-12 -left-12 w-24 h-24 rounded-full bg-amber-500/10 blur-xl"></div>
-            <div class="absolute -bottom-12 -right-12 w-24 h-24 rounded-full bg-blue-500/10 blur-xl"></div>
+        <!-- 電腦版自動切換為雙欄排版 (md:grid-cols-12) / 手機版保持單欄 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
             
-            <div class="grid grid-cols-2 gap-6 relative z-10">
-                <!-- 左側：開盤價 -->
-                <div class="flex flex-col items-center">
-                    <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
-                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
-                        <span>開盤價</span>
-                    </label>
-                    <!-- 圓弧輸入框 -->
-                    <div class="relative w-full group">
-                        <input type="number" id="open-price" step="0.01" placeholder="輸入開盤價" 
-                               class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
+            <!-- 左側區域：價格輸入與速查表卡片 (在電腦上佔 5 欄) -->
+            <div class="md:col-span-5 flex flex-col space-y-4 w-full">
+                
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+                    <!-- 裝飾用背景光效 -->
+                    <div class="absolute -top-12 -left-12 w-24 h-24 rounded-full bg-amber-500/10 blur-xl"></div>
+                    <div class="absolute -bottom-12 -right-12 w-24 h-24 rounded-full bg-blue-500/10 blur-xl"></div>
+                    
+                    <div class="grid grid-cols-2 gap-6 relative z-10">
+                        <!-- 左側：開盤價 -->
+                        <div class="flex flex-col items-center">
+                            <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                                <span>開盤價</span>
+                            </label>
+                            <!-- 圓弧輸入框 -->
+                            <div class="relative w-full group">
+                                <input type="number" id="open-price" step="0.01" placeholder="輸入開盤價" 
+                                       class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
+                            </div>
+                            <!-- 快速微調按鈕組 -->
+                            <div class="flex items-center space-x-1 mt-2.5">
+                                <button onclick="adjustVal('open-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
+                                <button onclick="adjustVal('open-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
+                                <button onclick="adjustVal('open-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
+                                <button onclick="adjustVal('open-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+                            </div>
+                        </div>
+
+                        <!-- 右側：昨收價 -->
+                        <div class="flex flex-col items-center">
+                            <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></span>
+                                <span>昨收價</span>
+                            </label>
+                            <!-- 圓弧輸入框 -->
+                            <div class="relative w-full group">
+                                <input type="number" id="close-price" step="0.01" placeholder="輸入昨收價" 
+                                       class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
+                            </div>
+                            <!-- 快速微調按鈕組 -->
+                            <div class="flex items-center space-x-1 mt-2.5">
+                                <button onclick="adjustVal('close-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
+                                <button onclick="adjustVal('close-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
+                                <button onclick="adjustVal('close-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
+                                <button onclick="adjustVal('close-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+                            </div>
+                        </div>
                     </div>
-                    <!-- 快速微調按鈕組 -->
-                    <div class="flex items-center space-x-1 mt-2.5">
-                        <button onclick="adjustVal('open-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
-                        <button onclick="adjustVal('open-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
-                        <button onclick="adjustVal('open-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
-                        <button onclick="adjustVal('open-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+
+                    <!-- 開盤漲跌幅即時速報看板 -->
+                    <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-sm">
+                        <span class="text-slate-500 dark:text-slate-400">今日開盤溢價率：</span>
+                        <span id="rate-badge" class="font-bold px-3 py-1 rounded-full text-xs transition-all-300">
+                            +0.00%
+                        </span>
+                    </div>
+                    
+                    <!-- 台股漲跌幅限制一鍵設定快捷鍵 -->
+                    <div class="mt-3 grid grid-cols-4 gap-1.5">
+                        <button onclick="setLimitPrice('漲停')" class="py-1 px-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition-all-300">漲停 (+10%)</button>
+                        <button onclick="setLimitPrice('強勢')" class="py-1 px-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all-300">強勢 (+5%)</button>
+                        <button onclick="setLimitPrice('平盤')" class="py-1 px-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-all-300">平盤 (0%)</button>
+                        <button onclick="setLimitPrice('跌停')" class="py-1 px-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all-300">跌停 (-10%)</button>
                     </div>
                 </div>
 
-                <!-- 右側：昨收價 -->
-                <div class="flex flex-col items-center">
-                    <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
-                        <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></span>
-                        <span>昨收價</span>
-                    </label>
-                    <!-- 圓弧輸入框 -->
-                    <div class="relative w-full group">
-                        <input type="number" id="close-price" step="0.01" placeholder="輸入昨收價" 
-                               class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
-                    </div>
-                    <!-- 快速微調按鈕組 -->
-                    <div class="flex items-center space-x-1 mt-2.5">
-                        <button onclick="adjustVal('close-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
-                        <button onclick="adjustVal('close-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
-                        <button onclick="adjustVal('close-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
-                        <button onclick="adjustVal('close-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+                <!-- 操盤關鍵價位速查表 -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mb-3 flex items-center justify-between">
+                        <span>📊 操盤關鍵價位速查表</span>
+                        <span class="text-[10px] text-slate-300 dark:text-slate-600">自動四捨五入</span>
+                    </h3>
+                    <div class="grid grid-cols-5 gap-1.5 text-center text-[11px]">
+                        <div class="bg-slate-50 dark:bg-slate-800/40 p-2 rounded-xl border border-slate-100 dark:border-slate-800/60">
+                            <div class="text-slate-400 mb-1">昨收 (0%)</div>
+                            <div id="p-0" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                        </div>
+                        <div class="bg-emerald-500/5 dark:bg-emerald-500/5 p-2 rounded-xl border border-emerald-500/10">
+                            <div class="text-slate-400 mb-1">弱勢 (2%)</div>
+                            <div id="p-2" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                        </div>
+                        <div class="bg-sky-500/5 dark:bg-sky-500/5 p-2 rounded-xl border border-sky-500/10">
+                            <div class="text-slate-400 mb-1">支撐 (3%)</div>
+                            <div id="p-3" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                        </div>
+                        <div class="bg-amber-500/5 dark:bg-amber-500/5 p-2 rounded-xl border border-amber-500/10">
+                            <div class="text-slate-400 mb-1">強勢 (5%)</div>
+                            <div id="p-5" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                        </div>
+                        <div class="bg-red-500/5 dark:bg-red-500/5 p-2 rounded-xl border border-red-500/10">
+                            <div class="text-slate-400 mb-1">滿足 (7%)</div>
+                            <div id="p-7" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- 開盤漲跌幅即時速報看板 -->
-            <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-sm">
-                <span class="text-slate-500 dark:text-slate-400">今日開盤溢價率：</span>
-                <span id="rate-badge" class="font-bold px-3 py-1 rounded-full text-xs transition-all-300">
-                    +0.00%
-                </span>
-            </div>
-            
-            <!-- 台股漲跌幅限制一鍵設定快捷鍵 -->
-            <div class="mt-3 grid grid-cols-4 gap-1.5">
-                <button onclick="setLimitPrice('漲停')" class="py-1 px-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition-all-300">漲停 (+10%)</button>
-                <button onclick="setLimitPrice('強勢')" class="py-1 px-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all-300">強勢 (+5%)</button>
-                <button onclick="setLimitPrice('平盤')" class="py-1 px-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-all-300">平盤 (0%)</button>
-                <button onclick="setLimitPrice('跌停')" class="py-1 px-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all-300">跌停 (-10%)</button>
-            </div>
-        </div>
+            <!-- 右側區域：決策建議與歷史紀錄 (在電腦上佔 7 欄) -->
+            <div class="md:col-span-7 flex flex-col space-y-4 w-full">
+                
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 flex flex-col justify-start w-full">
+                    <h2 class="text-center text-lg font-bold text-amber-500 dark:text-amber-400 mb-5 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span class="tracking-widest">操作建議</span>
+                    </h2>
+                    
+                    <div id="advice-container" class="space-y-4 text-sm leading-relaxed flex-1">
+                        <!-- 建議項目 1：強勢追擊區 -->
+                        <div id="rule-1" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                            <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                            <div>
+                                大於 <span class="calc-val text-blue-500 font-bold" id="val-r1-5">--</span> 且盤中不跌破 <span class="calc-val text-blue-500 font-bold" id="val-r1-3">--</span>，則明天大概率續漲，建議留倉！
+                            </div>
+                        </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
-            <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mb-3 flex items-center justify-between">
-                <span>📊 操盤關鍵價位速查表</span>
-                <span class="text-[10px] text-slate-300 dark:text-slate-600">自動四捨五入至小數後兩位</span>
-            </h3>
-            <div class="grid grid-cols-5 gap-1.5 text-center text-[11px]">
-                <div class="bg-slate-50 dark:bg-slate-800/40 p-2 rounded-xl border border-slate-100 dark:border-slate-800/60">
-                    <div class="text-slate-400 mb-1">昨收 (0%)</div>
-                    <div id="p-0" class="font-bold text-slate-700 dark:text-slate-300">--</div>
-                </div>
-                <div class="bg-emerald-500/5 dark:bg-emerald-500/5 p-2 rounded-xl border border-emerald-500/10">
-                    <div class="text-slate-400 mb-1">弱勢 (2%)</div>
-                    <div id="p-2" class="font-bold text-slate-700 dark:text-slate-300">--</div>
-                </div>
-                <div class="bg-sky-500/5 dark:bg-sky-500/5 p-2 rounded-xl border border-sky-500/10">
-                    <div class="text-slate-400 mb-1">支撐 (3%)</div>
-                    <div id="p-3" class="font-bold text-slate-700 dark:text-slate-300">--</div>
-                </div>
-                <div class="bg-amber-500/5 dark:bg-amber-500/5 p-2 rounded-xl border border-amber-500/10">
-                    <div class="text-slate-400 mb-1">強勢 (5%)</div>
-                    <div id="p-5" class="font-bold text-slate-700 dark:text-slate-300">--</div>
-                </div>
-                <div class="bg-red-500/5 dark:bg-red-500/5 p-2 rounded-xl border border-red-500/10">
-                    <div class="text-slate-400 mb-1">滿足 (7%)</div>
-                    <div id="p-7" class="font-bold text-slate-700 dark:text-slate-300">--</div>
-                </div>
-            </div>
-        </div>
+                        <!-- 建議項目 2：健康觀察/減倉區 -->
+                        <div id="rule-2" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                            <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                            <div>
+                                介於 <span class="calc-val text-blue-500 font-bold" id="val-r2-3">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r2-5">--</span> 之間仍算健康，但若盤中衝高到 <span class="calc-val text-blue-500 font-bold" id="val-r2-7">--</span> 以上，建議先減一半倉位
+                            </div>
+                        </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 flex-1 flex flex-col justify-start">
-            <h2 class="text-center text-lg font-bold text-amber-500 dark:text-amber-400 mb-5 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span class="tracking-widest">操作建議</span>
-            </h2>
-            
-            <div id="advice-container" class="space-y-4 text-sm leading-relaxed flex-1">
-                <!-- 建議項目 1：強勢追擊區 -->
-                <div id="rule-1" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
-                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
-                    <div>
-                        大於 <span class="calc-val text-blue-500 font-bold" id="val-r1-5">--</span> 且盤中不跌破 <span class="calc-val text-blue-500 font-bold" id="val-r1-3">--</span>，則明天大概率續漲，建議留倉！
+                        <!-- 建議項目 3：主力不振/清倉離場區 -->
+                        <div id="rule-3" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                            <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                            <div>
+                                介於 <span class="calc-val text-blue-500 font-bold" id="val-r3-0">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r3-2">--</span> 之間，說明主力作多意願不足，要是開盤半小時內不能放量上攻，就果斷清倉離場
+                            </div>
+                        </div>
+
+                        <!-- 建議項目 4：急挫逃命區 -->
+                        <div id="rule-4" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                            <span class="rule-icon mt-0.5 text-xs text-red-500">◆</span>
+                            <div>
+                                <span class="text-red-500 font-bold">出現負數</span>（開盤價低於昨收價），別猶豫，<span class="text-red-500 font-bold underline decoration-2 decoration-red-400 underline-offset-4">開盤就跑！</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 目前盤中狀態動態提示 -->
+                    <div id="current-status-banner" class="mt-5 p-3 rounded-2xl text-center text-xs font-semibold transition-all-300">
+                        載入中...
                     </div>
                 </div>
 
-                <!-- 建議項目 2：健康觀察/減倉區 -->
-                <div id="rule-2" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
-                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
-                    <div>
-                        介於 <span class="calc-val text-blue-500 font-bold" id="val-r2-3">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r2-5">--</span> 之間仍算健康，但若盤中衝高到 <span class="calc-val text-blue-500 font-bold" id="val-r2-7">--</span> 以上，建議先減一半倉位
+                <!-- 歷史紀錄 -->
+                <div id="history-section" class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 w-full">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase flex items-center space-x-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span>已儲存的判斷紀錄</span>
+                        </h3>
+                        <button id="btn-clear-history" class="text-[10px] text-red-400 hover:text-red-500 flex items-center space-x-0.5 transition-all-300">
+                            <i class="fa-regular fa-trash-can"></i>
+                            <span>清除全部</span>
+                        </button>
+                    </div>
+                    <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <p class="text-xs text-slate-400 text-center py-4">目前尚無儲存紀錄，輸入好股票後點擊上方「儲存」按鈕吧！</p>
                     </div>
                 </div>
 
-                <!-- 建議項目 3：主力不振/清倉離場區 -->
-                <div id="rule-3" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
-                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
-                    <div>
-                        介於 <span class="calc-val text-blue-500 font-bold" id="val-r3-0">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r3-2">--</span> 之間，說明主力作多意願不足，要是開盤半小時內不能放量上攻，就果斷清倉離場
-                    </div>
-                </div>
-
-                <!-- 建議項目 4：急挫逃命區 -->
-                <div id="rule-4" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
-                    <span class="rule-icon mt-0.5 text-xs text-red-500">◆</span>
-                    <div>
-                        <span class="text-red-500 font-bold">出現負數</span>（開盤價低於昨收價），別猶豫，<span class="text-red-500 font-bold underline decoration-2 decoration-red-400 underline-offset-4">開盤就跑！</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 目前盤中狀態動態提示 -->
-            <div id="current-status-banner" class="mt-5 p-3 rounded-2xl text-center text-xs font-semibold transition-all-300">
-                載入中...
-            </div>
-        </div>
-
-        <div id="history-section" class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase flex items-center space-x-1.5">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span>已儲存的判斷紀錄</span>
-                </h3>
-                <button id="btn-clear-history" class="text-[10px] text-red-400 hover:text-red-500 flex items-center space-x-0.5 transition-all-300">
-                    <i class="fa-regular fa-trash-can"></i>
-                    <span>清除全部</span>
-                </button>
-            </div>
-            <div id="history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1">
-                <p class="text-xs text-slate-400 text-center py-4">目前尚無儲存紀錄，輸入好股票後點擊上方「儲存」按鈕吧！</p>
             </div>
         </div>
 
     </main>
 
-    <footer class="w-full max-w-md mx-auto px-4 py-4 text-center text-[10px] text-slate-400 dark:text-slate-600 border-t border-slate-100 dark:border-slate-900/60 mt-auto">
+    <!-- 美化版系統提示模組 (完全替代老舊的 alert 與 confirm) -->
+    <div id="custom-alert-dialog" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-sm w-full border border-slate-100 dark:border-slate-800 shadow-xl flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-xl mb-4">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">提示</h3>
+            <p id="custom-alert-text" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5"></p>
+            <button onclick="closeAlert()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-semibold text-xs rounded-xl transition-all-300">確定</button>
+        </div>
+    </div>
+
+    <div id="custom-confirm-dialog" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-sm w-full border border-slate-100 dark:border-slate-800 shadow-xl flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/40 text-red-500 flex items-center justify-center text-xl mb-4">
+                <i class="fa-regular fa-trash-can"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">確認刪除</h3>
+            <p id="custom-confirm-text" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5"></p>
+            <div class="flex items-center space-x-2.5 w-full">
+                <button onclick="closeConfirm(false)" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold text-xs rounded-xl transition-all-300">取消</button>
+                <button onclick="closeConfirm(true)" class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold text-xs rounded-xl transition-all-300">確認清除</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full max-w-md md:max-w-5xl mx-auto px-4 py-4 text-center text-[10px] text-slate-400 dark:text-slate-600 border-t border-slate-100 dark:border-slate-900/60 mt-auto">
         <p class="mb-1">💡 提示：本工具主要用於計算 <span class="font-semibold text-slate-500 dark:text-slate-400">開盤溢價率</span> ，使用場景前提條件是昨日收盤漲停，其操作建議僅供參考，不代表投資保證。</p>
         <p>© 2026 紅k決策王. 投資有風險，本程式建議僅供參考，不代表投資保證。</p>
     </footer>
@@ -315,6 +357,32 @@
         const btnSave = document.getElementById('btn-save');
         const btnClearHistory = document.getElementById('btn-clear-history');
         const historyList = document.getElementById('history-list');
+
+        // 美化版彈窗系統回呼控制
+        let onConfirmCallback = null;
+
+        function triggerAlert(msg) {
+            document.getElementById('custom-alert-text').textContent = msg;
+            document.getElementById('custom-alert-dialog').classList.remove('hidden');
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert-dialog').classList.add('hidden');
+        }
+
+        function triggerConfirm(msg, callback) {
+            document.getElementById('custom-confirm-text').textContent = msg;
+            onConfirmCallback = callback;
+            document.getElementById('custom-confirm-dialog').classList.remove('hidden');
+        }
+
+        function closeConfirm(isAccepted) {
+            document.getElementById('custom-confirm-dialog').classList.add('hidden');
+            if (isAccepted && onConfirmCallback) {
+                onConfirmCallback();
+            }
+            onConfirmCallback = null;
+        }
 
         // 音效管理器 (輕量 Web Audio API 實現，無需引入額外巨大資源)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -616,7 +684,7 @@
             const closeVal = parseFloat(closeInput.value) || 0;
 
             if (openVal <= 0 || closeVal <= 0) {
-                alert("請填入有效的開盤價與昨收價再進行存檔！");
+                triggerAlert("請填入有效的開盤價與昨收價再進行存檔！");
                 return;
             }
 
@@ -640,12 +708,12 @@
         });
 
         btnClearHistory.addEventListener('click', () => {
-            if (confirm("您確定要刪除所有已儲存的選股判定紀錄嗎？")) {
+            triggerConfirm("您確定要刪除所有已儲存的選股判定紀錄嗎？", () => {
                 playHapticTone('alert');
                 state.history = [];
                 localStorage.setItem('stock_decision_history', JSON.stringify(state.history));
                 renderHistory();
-            }
+            });
         });
 
         themeBtn.addEventListener('click', () => {
