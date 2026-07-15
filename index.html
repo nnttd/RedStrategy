@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紅k決策王 - 昨日漲停收紅k快速決策</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 隱藏 Chrome, Safari, Edge, Opera 的數字輸入框上下箭頭 */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* 隱藏 Firefox 的數字輸入框上下箭頭 */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* 平滑過渡動畫 */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-full flex flex-col justify-between transition-all-300">
+
+    <header class="w-full max-w-md mx-auto px-4 pt-4 pb-2 flex justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+            <!-- 完美的內嵌 SVG 橘黃色 K 線趨勢 Logo，100% 離線相容且絕不失真 -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-8 h-8 rounded-lg shadow-md shadow-amber-500/15">
+                <defs>
+                    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f59e0b" />
+                        <stop offset="100%" stop-color="#d97706" />
+                    </linearGradient>
+                </defs>
+                <!-- 橘黃色漸層背景 -->
+                <rect width="100" height="100" rx="24" fill="url(#logo-grad)" />
+                <!-- 坐標軸 L 型 -->
+                <path d="M 28 28 L 28 72 L 72 72" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- 背景 K 線柱狀圖 (燭台體) -->
+                <!-- 柱 1 -->
+                <line x1="38" y1="50" x2="38" y2="65" stroke="#ffffff" stroke-width="1.5" opacity="0.6" />
+                <rect x="35" y="54" width="6" height="8" rx="1" fill="#ffffff" opacity="0.8" />
+                <!-- 柱 2 -->
+                <line x1="48" y1="38" x2="48" y2="58" stroke="#ffffff" stroke-width="1.5" opacity="0.6" />
+                <rect x="45" y="42" width="6" height="10" rx="1" fill="#ffffff" opacity="0.8" />
+                <!-- 柱 3 -->
+                <line x1="58" y1="42" x2="58" y2="58" stroke="#ffffff" stroke-width="1.5" opacity="0.6" />
+                <rect x="55" y="46" width="6" height="8" rx="1" fill="#ffffff" opacity="0.8" />
+                <!-- 柱 4 -->
+                <line x1="68" y1="30" x2="68" y2="48" stroke="#ffffff" stroke-width="1.5" opacity="0.6" />
+                <rect x="65" y="34" width="6" height="10" rx="1" fill="#ffffff" opacity="0.8" />
+                <!-- 前景白色折線 -->
+                <path d="M 34 62 L 48 48 L 56 54 L 70 36" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- 箭頭 -->
+                <path d="M 62 36 L 70 36 L 70 44" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div>
+                <h1 class="text-base font-bold tracking-wider">紅k決策王</h1>
+                <p class="text-[10px] text-slate-400 dark:text-slate-500">昨日漲停收紅k，今日快速決策</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+            <!-- 漲跌顏色機制切換 (台股紅漲綠跌 vs 國際綠漲紅跌) -->
+            <button id="color-scheme-btn" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition-all-300 text-xs flex items-center space-x-1" title="切換紅綠漲跌定義">
+                <span id="color-scheme-text">🔴 台股格式</span>
+            </button>
+            
+            <!-- 深色/淺色模式切換 -->
+            <button id="theme-btn" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition-all-300">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-md mx-auto px-4 py-4 flex flex-col space-y-4">
+        
+        <!-- 股票代號/名稱快捷輸入列 -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+            <input type="text" id="stock-info" placeholder="輸入股號/股名 (選填，例如: 台積電 2330)" class="bg-transparent border-none outline-none text-sm w-full font-medium placeholder-slate-400 dark:placeholder-slate-600 focus:ring-0">
+            <button id="btn-save" class="text-xs font-semibold px-3 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-lg transition-all-300 flex items-center space-x-1 shadow-sm">
+                <i class="fa-solid fa-bookmark"></i>
+                <span>儲存</span>
+            </button>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+            <!-- 裝飾用背景光效 -->
+            <div class="absolute -top-12 -left-12 w-24 h-24 rounded-full bg-amber-500/10 blur-xl"></div>
+            <div class="absolute -bottom-12 -right-12 w-24 h-24 rounded-full bg-blue-500/10 blur-xl"></div>
+            
+            <div class="grid grid-cols-2 gap-6 relative z-10">
+                <!-- 左側：開盤價 -->
+                <div class="flex flex-col items-center">
+                    <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        <span>開盤價</span>
+                    </label>
+                    <!-- 圓弧輸入框 -->
+                    <div class="relative w-full group">
+                        <input type="number" id="open-price" step="0.01" placeholder="輸入開盤價" 
+                               class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
+                    </div>
+                    <!-- 快速微調按鈕組 -->
+                    <div class="flex items-center space-x-1 mt-2.5">
+                        <button onclick="adjustVal('open-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
+                        <button onclick="adjustVal('open-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
+                        <button onclick="adjustVal('open-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
+                        <button onclick="adjustVal('open-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+                    </div>
+                </div>
+
+                <!-- 右側：昨收價 -->
+                <div class="flex flex-col items-center">
+                    <label class="text-base font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center space-x-1">
+                        <span class="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></span>
+                        <span>昨收價</span>
+                    </label>
+                    <!-- 圓弧輸入框 -->
+                    <div class="relative w-full group">
+                        <input type="number" id="close-price" step="0.01" placeholder="輸入昨收價" 
+                               class="w-full text-center text-2xl font-bold py-3 px-2 rounded-2xl border-4 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 transition-all-300 group-hover:border-slate-400 dark:group-hover:border-slate-600 placeholder:text-sm placeholder:font-normal placeholder-slate-400 dark:placeholder-slate-500">
+                    </div>
+                    <!-- 快速微調按鈕組 -->
+                    <div class="flex items-center space-x-1 mt-2.5">
+                        <button onclick="adjustVal('close-price', -1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-1</button>
+                        <button onclick="adjustVal('close-price', -0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">-0.1</button>
+                        <button onclick="adjustVal('close-price', 0.1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+0.1</button>
+                        <button onclick="adjustVal('close-price', 1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold active:scale-90 transition-all-300">+1</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 開盤漲跌幅即時速報看板 -->
+            <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-sm">
+                <span class="text-slate-500 dark:text-slate-400">今日開盤溢價率：</span>
+                <span id="rate-badge" class="font-bold px-3 py-1 rounded-full text-xs transition-all-300">
+                    +0.00%
+                </span>
+            </div>
+            
+            <!-- 台股漲跌幅限制一鍵設定快捷鍵 -->
+            <div class="mt-3 grid grid-cols-4 gap-1.5">
+                <button onclick="setLimitPrice('漲停')" class="py-1 px-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition-all-300">漲停 (+10%)</button>
+                <button onclick="setLimitPrice('強勢')" class="py-1 px-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold transition-all-300">強勢 (+5%)</button>
+                <button onclick="setLimitPrice('平盤')" class="py-1 px-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition-all-300">平盤 (0%)</button>
+                <button onclick="setLimitPrice('跌停')" class="py-1 px-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all-300">跌停 (-10%)</button>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+            <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mb-3 flex items-center justify-between">
+                <span>📊 操盤關鍵價位速查表</span>
+                <span class="text-[10px] text-slate-300 dark:text-slate-600">自動四捨五入至小數後兩位</span>
+            </h3>
+            <div class="grid grid-cols-5 gap-1.5 text-center text-[11px]">
+                <div class="bg-slate-50 dark:bg-slate-800/40 p-2 rounded-xl border border-slate-100 dark:border-slate-800/60">
+                    <div class="text-slate-400 mb-1">昨收 (0%)</div>
+                    <div id="p-0" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                </div>
+                <div class="bg-emerald-500/5 dark:bg-emerald-500/5 p-2 rounded-xl border border-emerald-500/10">
+                    <div class="text-slate-400 mb-1">弱勢 (2%)</div>
+                    <div id="p-2" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                </div>
+                <div class="bg-sky-500/5 dark:bg-sky-500/5 p-2 rounded-xl border border-sky-500/10">
+                    <div class="text-slate-400 mb-1">支撐 (3%)</div>
+                    <div id="p-3" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                </div>
+                <div class="bg-amber-500/5 dark:bg-amber-500/5 p-2 rounded-xl border border-amber-500/10">
+                    <div class="text-slate-400 mb-1">強勢 (5%)</div>
+                    <div id="p-5" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                </div>
+                <div class="bg-red-500/5 dark:bg-red-500/5 p-2 rounded-xl border border-red-500/10">
+                    <div class="text-slate-400 mb-1">滿足 (7%)</div>
+                    <div id="p-7" class="font-bold text-slate-700 dark:text-slate-300">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-100 dark:border-slate-800 flex-1 flex flex-col justify-start">
+            <h2 class="text-center text-lg font-bold text-amber-500 dark:text-amber-400 mb-5 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="tracking-widest">操作建議</span>
+            </h2>
+            
+            <div id="advice-container" class="space-y-4 text-sm leading-relaxed flex-1">
+                <!-- 建議項目 1：強勢追擊區 -->
+                <div id="rule-1" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                    <div>
+                        大於 <span class="calc-val text-blue-500 font-bold" id="val-r1-5">--</span> 且盤中不跌破 <span class="calc-val text-blue-500 font-bold" id="val-r1-3">--</span>，則明天大概率續漲，建議留倉！
+                    </div>
+                </div>
+
+                <!-- 建議項目 2：健康觀察/減倉區 -->
+                <div id="rule-2" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                    <div>
+                        介於 <span class="calc-val text-blue-500 font-bold" id="val-r2-3">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r2-5">--</span> 之間仍算健康，但若盤中衝高到 <span class="calc-val text-blue-500 font-bold" id="val-r2-7">--</span> 以上，建議先減一半倉位
+                    </div>
+                </div>
+
+                <!-- 建議項目 3：主力不振/清倉離場區 -->
+                <div id="rule-3" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                    <span class="rule-icon mt-0.5 text-xs text-blue-500">◆</span>
+                    <div>
+                        介於 <span class="calc-val text-blue-500 font-bold" id="val-r3-0">--</span> 至 <span class="calc-val text-blue-500 font-bold" id="val-r3-2">--</span> 之間，說明主力作多意願不足，要是開盤半小時內不能放量上攻，就果斷清倉離場
+                    </div>
+                </div>
+
+                <!-- 建議項目 4：急挫逃命區 -->
+                <div id="rule-4" class="p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5">
+                    <span class="rule-icon mt-0.5 text-xs text-red-500">◆</span>
+                    <div>
+                        <span class="text-red-500 font-bold">出現負數</span>（開盤價低於昨收價），別猶豫，<span class="text-red-500 font-bold underline decoration-2 decoration-red-400 underline-offset-4">開盤就跑！</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 目前盤中狀態動態提示 -->
+            <div id="current-status-banner" class="mt-5 p-3 rounded-2xl text-center text-xs font-semibold transition-all-300">
+                載入中...
+            </div>
+        </div>
+
+        <div id="history-section" class="bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase flex items-center space-x-1.5">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>已儲存的判斷紀錄</span>
+                </h3>
+                <button id="btn-clear-history" class="text-[10px] text-red-400 hover:text-red-500 flex items-center space-x-0.5 transition-all-300">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <span>清除全部</span>
+                </button>
+            </div>
+            <div id="history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                <p class="text-xs text-slate-400 text-center py-4">目前尚無儲存紀錄，輸入好股票後點擊上方「儲存」按鈕吧！</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="w-full max-w-md mx-auto px-4 py-4 text-center text-[10px] text-slate-400 dark:text-slate-600 border-t border-slate-100 dark:border-slate-900/60 mt-auto">
+        <p class="mb-1">💡 提示：本工具主要用於計算 <span class="font-semibold text-slate-500 dark:text-slate-400">開盤溢價率</span> ，使用場景前提條件是昨日收盤漲停，其操作建議僅供參考，不代表投資保證。</p>
+        <p>© 2026 紅k決策王. 投資有風險，本程式建議僅供參考，不代表投資保證。</p>
+    </footer>
+
+    <script>
+        // 初始化應用狀態
+        let state = {
+            theme: localStorage.getItem('theme') || 'light',
+            colorScheme: localStorage.getItem('colorScheme') || 'tw', // 'tw' = 🔴漲🟢跌, 'intl' = 🟢漲🔴跌
+            history: JSON.parse(localStorage.getItem('stock_decision_history')) || [],
+            lastOpenPrice: localStorage.getItem('last_open_price') || '',
+            lastClosePrice: localStorage.getItem('last_close_price') || ''
+        };
+
+        // DOM 元素引用
+        const openInput = document.getElementById('open-price');
+        const closeInput = document.getElementById('close-price');
+        const stockInfoInput = document.getElementById('stock-info');
+        const rateBadge = document.getElementById('rate-badge');
+        
+        // 關鍵價位展示元素
+        const p0 = document.getElementById('p-0');
+        const p2 = document.getElementById('p-2');
+        const p3 = document.getElementById('p-3');
+        const p5 = document.getElementById('p-5');
+        const p7 = document.getElementById('p-7');
+
+        // 建議展示內容中的數值元素
+        const valR15 = document.getElementById('val-r1-5');
+        const valR13 = document.getElementById('val-r1-3');
+        const valR23 = document.getElementById('val-r2-3');
+        const valR25 = document.getElementById('val-r2-5');
+        const valR27 = document.getElementById('val-r2-7');
+        const valR30 = document.getElementById('val-r3-0');
+        const valR32 = document.getElementById('val-r3-2');
+
+        // 規則區塊元素
+        const rule1 = document.getElementById('rule-1');
+        const rule2 = document.getElementById('rule-2');
+        const rule3 = document.getElementById('rule-3');
+        const rule4 = document.getElementById('rule-4');
+        const currentStatusBanner = document.getElementById('current-status-banner');
+
+        // 按鈕元件
+        const themeBtn = document.getElementById('theme-btn');
+        const colorSchemeBtn = document.getElementById('color-scheme-btn');
+        const colorSchemeText = document.getElementById('color-scheme-text');
+        const btnSave = document.getElementById('btn-save');
+        const btnClearHistory = document.getElementById('btn-clear-history');
+        const historyList = document.getElementById('history-list');
+
+        // 音效管理器 (輕量 Web Audio API 實現，無需引入額外巨大資源)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playHapticTone(type = 'click') {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'alert') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); // G5
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.35);
+                }
+            } catch (e) {
+                console.log('Audio Context error (User gesture might be required first):', e);
+            }
+        }
+
+        function applyTheme() {
+            if (state.theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('theme', state.theme);
+        }
+
+        function applyColorScheme() {
+            if (state.colorScheme === 'tw') {
+                colorSchemeText.innerHTML = '🔴 漲/🟢 跌 (台股)';
+            } else {
+                colorSchemeText.innerHTML = '🟢 漲/🔴 跌 (國際)';
+            }
+            localStorage.setItem('colorScheme', state.colorScheme);
+            calculateMetrics(); // 重新渲染顏色
+        }
+
+        // 微調數值邏輯
+        window.adjustVal = function(id, diff) {
+            playHapticTone('click');
+            const el = document.getElementById(id);
+            let val = parseFloat(el.value) || 0;
+            val = Math.max(0, val + diff);
+            el.value = val.toFixed(2);
+            calculateMetrics();
+        };
+
+        // 一鍵設定漲跌停價位邏輯
+        window.setLimitPrice = function(type) {
+            playHapticTone('click');
+            const yesterdayClose = parseFloat(closeInput.value) || 0;
+            if (yesterdayClose <= 0) return;
+
+            let targetPrice = yesterdayClose;
+            switch(type) {
+                case '漲停':
+                    targetPrice = yesterdayClose * 1.10;
+                    break;
+                case '強勢':
+                    targetPrice = yesterdayClose * 1.05;
+                    break;
+                case '平盤':
+                    targetPrice = yesterdayClose;
+                    break;
+                case '跌停':
+                    targetPrice = yesterdayClose * 0.90;
+                    break;
+            }
+            openInput.value = targetPrice.toFixed(2);
+            calculateMetrics();
+        };
+
+        function calculateMetrics() {
+            const open = parseFloat(openInput.value) || 0;
+            const close = parseFloat(closeInput.value) || 0;
+
+            // 儲存當前最新輸入值至 localStorage (即時記憶)
+            localStorage.setItem('last_open_price', openInput.value);
+            localStorage.setItem('last_close_price', closeInput.value);
+
+            if (open === 0 || close === 0) {
+                // 如果輸入未滿，清空數值
+                document.querySelectorAll('.calc-val').forEach(el => el.textContent = '--');
+                currentStatusBanner.textContent = "請輸入開盤價及昨收價";
+                currentStatusBanner.className = "mt-5 p-3 rounded-2xl text-center text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500";
+                return;
+            }
+
+            // 計算昨收價的各個百分比防守價
+            const val0 = close;
+            const val2 = close * 1.02;
+            const val3 = close * 1.03;
+            const val5 = close * 1.05;
+            const val7 = close * 1.07;
+
+            // 格式化為小數後兩位
+            const str0 = val0.toFixed(2);
+            const str2 = val2.toFixed(2);
+            const str3 = val3.toFixed(2);
+            const str5 = val5.toFixed(2);
+            const str7 = val7.toFixed(2);
+
+            // 填入速查表中
+            p0.textContent = str0;
+            p2.textContent = str2;
+            p3.textContent = str3;
+            p5.textContent = str5;
+            p7.textContent = str7;
+
+            // 即時計算並填入建議文字內
+            valR15.textContent = str5;
+            valR13.textContent = str3;
+            valR23.textContent = str3;
+            valR25.textContent = str5;
+            valR27.textContent = str7;
+            valR30.textContent = str0;
+            valR32.textContent = str2;
+
+            // 計算漲幅幅度
+            const pct = ((open - close) / close) * 100;
+            const isNegative = open < close;
+
+            // 更新開盤漲跌幅看板樣式 (依據設定的配色方案)
+            rateBadge.textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+            if (pct > 0) {
+                if (state.colorScheme === 'tw') {
+                    rateBadge.className = "font-bold px-3 py-1 rounded-full text-xs bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400";
+                } else {
+                    rateBadge.className = "font-bold px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400";
+                }
+            } else if (pct < 0) {
+                if (state.colorScheme === 'tw') {
+                    rateBadge.className = "font-bold px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400";
+                } else {
+                    rateBadge.className = "font-bold px-3 py-1 rounded-full text-xs bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400";
+                }
+            } else {
+                rateBadge.className = "font-bold px-3 py-1 rounded-full text-xs bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
+            }
+
+            // 重置所有規則塊的高亮
+            resetRuleHighlights();
+
+            // 根據計算出的百分比以及開盤價判定適用哪一條規則（動態高亮機制）
+            let activeRule = null;
+            let statusText = "";
+            let bannerClass = "";
+
+            if (isNegative) {
+                // 1. 出現負數 (開盤價小於昨收價)
+                activeRule = rule4;
+                statusText = "🚨 警訊！今日開盤價低於昨收價（出現負數），強烈建議開盤立即離場！";
+                if (state.colorScheme === 'tw') {
+                    bannerClass = "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-500/20";
+                } else {
+                    bannerClass = "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-500/20";
+                }
+                playHapticTone('alert');
+            } else if (open >= val5) {
+                // 2. 開盤價 >= 5% 
+                activeRule = rule1;
+                statusText = `🔥 強勢：開盤價大於 5% 關鍵點 (${str5})！只要盤中守住 ${str3} 續漲機率高，建議續留倉！`;
+                if (state.colorScheme === 'tw') {
+                    bannerClass = "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-500/20";
+                } else {
+                    bannerClass = "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-500/20";
+                }
+            } else if (open >= val3 && open < val5) {
+                // 3. 介於 3% 至 5% 之間
+                activeRule = rule2;
+                statusText = `⭐ 偏多：開盤介於 3% ~ 5% 盤勢健康。若盤中衝高突破 7% (${str7}) 後出現快速拉低走勢，建議先減半倉位落袋為安。`;
+                bannerClass = "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-500/20";
+            } else if (open >= val0 && open <= val2) {
+                // 4. 介於昨收與 2% 之間
+                activeRule = rule3;
+                statusText = `⚠️ 偏弱：開盤介於 0% ~ 2% 表示主力拉抬意願不足。開盤半小時若無法補量進攻，建議先離場觀望。`;
+                bannerClass = "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
+            } else {
+                // 介於 2% 到 3% 之間 (橋接區間)
+                statusText = `📝 溫和整理：開盤介於 ${str2} ~ ${str3} 區間，屬於主力震盪洗盤行情，建議靜待方向抉擇。`;
+                bannerClass = "bg-sky-50 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400 border border-sky-500/20";
+            }
+
+            // 套用高亮樣式
+            if (activeRule) {
+                activeRule.classList.remove('border-transparent');
+                activeRule.classList.add('border-amber-400', 'bg-amber-50/50', 'dark:bg-amber-950/20', 'scale-[1.02]', 'shadow-sm');
+                // 改變指示符為閃爍的星星
+                const indicator = activeRule.querySelector('.rule-icon');
+                if (indicator) {
+                    indicator.innerHTML = '★';
+                    indicator.classList.remove('text-blue-500', 'text-red-500');
+                    indicator.classList.add('text-amber-500', 'animate-pulse');
+                }
+            }
+
+            currentStatusBanner.textContent = statusText;
+            currentStatusBanner.className = `mt-5 p-3 rounded-2xl text-center text-xs font-semibold transition-all-300 ${bannerClass}`;
+        }
+
+        function resetRuleHighlights() {
+            [rule1, rule2, rule3, rule4].forEach(rule => {
+                rule.className = "p-3 rounded-2xl transition-all-300 border border-transparent flex items-start space-x-2.5";
+                const indicator = rule.querySelector('.rule-icon');
+                if (indicator) {
+                    indicator.innerHTML = '◆';
+                    indicator.classList.remove('text-amber-500', 'animate-pulse');
+                    if (rule === rule4) {
+                        indicator.classList.add('text-red-500');
+                    } else {
+                        indicator.classList.add('text-blue-500');
+                    }
+                }
+            });
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (state.history.length === 0) {
+                historyList.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">目前尚無儲存紀錄，輸入好股票後點擊上方「儲存」按鈕吧！</p>`;
+                return;
+            }
+
+            state.history.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-slate-50 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs hover:border-slate-200 dark:hover:border-slate-700 transition-all-300";
+                
+                const changePct = ((item.open - item.close) / item.close) * 100;
+                const changeSign = changePct >= 0 ? '+' : '';
+                let colorClass = "text-slate-500";
+                if (changePct > 0) colorClass = state.colorScheme === 'tw' ? 'text-red-500' : 'text-emerald-500';
+                if (changePct < 0) colorClass = state.colorScheme === 'tw' ? 'text-emerald-500' : 'text-red-500';
+
+                itemDiv.innerHTML = `
+                    <div class="cursor-pointer flex-1" onclick="loadHistoryItem(${index})">
+                        <div class="font-bold text-slate-700 dark:text-slate-200">${item.stock || '未命名個股'}</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">
+                            開盤: <span class="font-semibold text-slate-600 dark:text-slate-300">${item.open.toFixed(2)}</span> 
+                            昨收: <span class="font-semibold text-slate-600 dark:text-slate-300">${item.close.toFixed(2)}</span> 
+                            (<span class="font-bold ${colorClass}">${changeSign}${changePct.toFixed(2)}%</span>)
+                        </div>
+                    </div>
+                    <button onclick="deleteHistoryItem(event, ${index})" class="p-1 text-slate-400 hover:text-red-400 transition-all-300">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                `;
+                historyList.appendChild(itemDiv);
+            });
+        }
+
+        window.loadHistoryItem = function(index) {
+            playHapticTone('click');
+            const item = state.history[index];
+            stockInfoInput.value = item.stock;
+            openInput.value = item.open.toFixed(2);
+            closeInput.value = item.close.toFixed(2);
+            calculateMetrics();
+        };
+
+        window.deleteHistoryItem = function(event, index) {
+            event.stopPropagation();
+            playHapticTone('alert');
+            state.history.splice(index, 1);
+            localStorage.setItem('stock_decision_history', JSON.stringify(state.history));
+            renderHistory();
+        };
+
+        // 綁定事件監聽
+        openInput.addEventListener('input', calculateMetrics);
+        closeInput.addEventListener('input', calculateMetrics);
+
+        btnSave.addEventListener('click', () => {
+            const stockName = stockInfoInput.value.trim() || `自選股_${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            const openVal = parseFloat(openInput.value) || 0;
+            const closeVal = parseFloat(closeInput.value) || 0;
+
+            if (openVal <= 0 || closeVal <= 0) {
+                alert("請填入有效的開盤價與昨收價再進行存檔！");
+                return;
+            }
+
+            // 新增至最前面
+            state.history.unshift({
+                stock: stockName,
+                open: openVal,
+                close: closeVal,
+                timestamp: Date.now()
+            });
+
+            // 限制最多儲存 10 筆
+            if (state.history.length > 10) {
+                state.history.pop();
+            }
+
+            localStorage.setItem('stock_decision_history', JSON.stringify(state.history));
+            playHapticTone('success');
+            renderHistory();
+            stockInfoInput.value = ''; // 儲存完清空名字輸入框
+        });
+
+        btnClearHistory.addEventListener('click', () => {
+            if (confirm("您確定要刪除所有已儲存的選股判定紀錄嗎？")) {
+                playHapticTone('alert');
+                state.history = [];
+                localStorage.setItem('stock_decision_history', JSON.stringify(state.history));
+                renderHistory();
+            }
+        });
+
+        themeBtn.addEventListener('click', () => {
+            playHapticTone('click');
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            applyTheme();
+        });
+
+        colorSchemeBtn.addEventListener('click', () => {
+            playHapticTone('click');
+            state.colorScheme = state.colorScheme === 'tw' ? 'intl' : 'tw';
+            applyColorScheme();
+        });
+
+        // 頁面初始化
+        window.onload = function() {
+            applyTheme();
+            applyColorScheme();
+            
+            // 載入上次關閉時儲存的數值（若無，欄位將保持空白並顯示灰字 Placeholder）
+            openInput.value = state.lastOpenPrice;
+            closeInput.value = state.lastClosePrice;
+            
+            calculateMetrics();
+            renderHistory();
+        };
+    </script>
+</body>
+</html>
